@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Študentský prehľad</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Vitajte, <span th:text="${studentName}">Študent</span></h1>
+
+    <h2>Dostupné termíny na konzultáciu</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Učiteľ</th>
+            <th>Dátum a čas</th>
+            <th>Popis</th>
+            <th>Akcia</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="slot : ${availableSlots}">
+            <td th:text="${slot.teacher.fullName}"></td>
+            <td th:text="${#temporals.format(slot.startTime, 'dd.MM.yyyy HH:mm')} + ' - ' + ${#temporals.format(slot.endTime, 'HH:mm')}"></td>
+            <td th:text="${slot.description}"></td>
+            <td>
+                <form action="/student/reserve" method="post">
+                    <input type="hidden" name="slotId" th:value="${slot.id}">
+                    <button type="submit" class="btn">Rezervovať</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(availableSlots)}">
+            <td colspan="4" style="text-align: center;">Momentálne nie sú dostupné žiadne termíny.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 style="margin-top: 40px;">Moje rezervácie</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Učiteľ</th>
+            <th>Termín</th>
+            <th>Vytvorené</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="res : ${myReservations}">
+            <td th:text="${res.slot.teacher.fullName}"></td>
+            <td th:text="${#temporals.format(res.slot.startTime, 'dd.MM.yyyy HH:mm')}"></td>
+            <td th:text="${#temporals.format(res.createdAt, 'dd.MM.yyyy HH:mm')}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(myReservations)}">
+            <td colspan="3" style="text-align: center;">Nemáte žiadne rezervácie.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

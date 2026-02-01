@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Učiteľský prehľad</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Vitajte, <span th:text="${teacherName}">Učiteľ</span></h1>
+
+    <h2>Vytvoriť nový termín</h2>
+    <form action="/teacher/create" method="post" onsubmit="prepareDates()" class="create-slot-form">
+
+        <!-- datum a casy -->
+        <div class="datetime-row">
+            <!-- datum -->
+            <div class="form-group inline-group">
+                <label>Dátum:</label>
+                <input type="date" id="dateInput" required>
+            </div>
+
+            <!-- casy -->
+            <!-- zaciatok -->
+            <div class="form-group inline-group">
+                <label>Začiatok:</label>
+                <div class="time-selects">
+                    <select id="startHour" onchange="autoSetEndTime()">
+                        <option value="07">07</option>
+                        <option value="08">08</option>
+                        <option value="09">09</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                    </select>
+                    <span>:</span>
+                    <select id="startMinute" onchange="autoSetEndTime()">
+                        <option value="00">00</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="40">40</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- koniec -->
+            <div class="form-group inline-group">
+                <label>Koniec:</label>
+                <div class="time-selects">
+                    <select id="endHour">
+                        <option value="07">07</option>
+                        <option value="08">08</option>
+                        <option value="09">09</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                    </select>
+                    <span>:</span>
+                    <select id="endMinute">
+                        <option value="00">00</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="40">40</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Popis:</label>
+            <input type="text" name="description" placeholder="Napr. Konzultácia k BP" required>
+        </div>
+
+        <!-- skryte polia kvoli jave -->
+        <input type="hidden" name="start" id="realStartInput">
+        <input type="hidden" name="end" id="realEndInput">
+
+        <div class="button-row">
+            <button type="submit" class="btn">Vytvoriť termín</button>
+        </div>
+    </form>
+
+    <h2>Moje vypísané termíny</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Dátum a čas</th>
+            <th>Popis</th>
+            <th>Stav</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="slot : ${slots}">
+            <td th:text="${#temporals.format(slot.startTime, 'dd.MM.yyyy HH:mm')} + ' - ' + ${#temporals.format(slot.endTime, 'HH:mm')}"></td>
+            <td th:text="${slot.description}"></td>
+            <td>
+                <span th:if="${slot.active}" style="color: green; font-weight: bold;">Aktívny</span>
+                <span th:unless="${slot.active}" style="color: red;">Zrušený</span>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(slots)}">
+            <td colspan="3" style="text-align: center;">Zatiaľ ste nevypísali žiadne termíny.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function autoSetEndTime() {
+        var sHour = parseInt(document.getElementById('startHour').value);
+        var sMin = parseInt(document.getElementById('startMinute').value);
+
+        var totalMinutes = (sHour * 60) + sMin;
+        var endTotalMinutes = totalMinutes + 30;
+
+        //prepocet naspat na hodiny minuty
+        var newEndHour = Math.floor(endTotalMinutes / 60);
+        var newEndMin = endTotalMinutes % 60;
+
+        var finalHourStr = newEndHour < 10 ? '0' + newEndHour : '' + newEndHour;
+        var finalMinStr = newEndMin === 0 ? '00' : (newEndMin < 10 ? '0' + newEndMin : '' + newEndMin);
+
+        var endHourSelect = document.getElementById('endHour');
+        var endMinSelect = document.getElementById('endMinute');
+
+        if(querySelectorOptionExists(endHourSelect, finalHourStr)) {
+            endHourSelect.value = finalHourStr;
+        }
+        if(querySelectorOptionExists(endMinSelect, finalMinStr)) {
+            endMinSelect.value = finalMinStr;
+        }
+    }
+
+    //kontrola ci select obsahuje vsetky hodnoty
+    function querySelectorOptionExists(selectElement, value) {
+        for (var i = 0; i < selectElement.options.length; i++) {
+            if (selectElement.options[i].value === value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function prepareDates() {
+        var dateVal = document.getElementById('dateInput').value;
+
+        var sHour = document.getElementById('startHour').value;
+        var sMin = document.getElementById('startMinute').value;
+
+        var eHour = document.getElementById('endHour').value;
+        var eMin = document.getElementById('endMinute').value;
+
+        //iso 8601
+        var startDateTime = dateVal + 'T' + sHour + ':' + sMin;
+        var endDateTime = dateVal + 'T' + eHour + ':' + eMin;
+
+        //vlozit do skrytch poli ktore sa odoslu
+        document.getElementById('realStartInput').value = startDateTime;
+        document.getElementById('realEndInput').value = endDateTime;
+    }
+</script>
+</body>
+</html>

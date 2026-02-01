@@ -7,7 +7,9 @@ import java.time.LocalDateTime;
 @Table(name = "consultation_slots")
 @NamedQuery(name = "ConsultationSlot.findByTeacher", query = "SELECT s FROM ConsultationSlot s WHERE s.teacher = :teacher")
 @NamedQuery(name = "ConsultationSlot.findAllActive", query = "SELECT s FROM ConsultationSlot s WHERE s.active = true ORDER BY s.startTime")
-@NamedQuery(name = "ConsultationSlot.findFuture", query = "SELECT s FROM ConsultationSlot s WHERE s.active = true AND s.startTime > :now ORDER BY s.startTime")
+//@NamedQuery(name = "ConsultationSlot.findFuture", query = "SELECT s FROM ConsultationSlot s WHERE s.active = true AND s.startTime > :now ORDER BY s.startTime")
+@NamedQuery(name = "ConsultationSlot.findAvailableFuture", query = "SELECT s FROM ConsultationSlot s WHERE s.active = true AND s.startTime > :now " +
+                "AND NOT EXISTS (SELECT r FROM Reservation r WHERE r.slot = s AND r.active = true) " + "ORDER BY s.startTime")
 
 public class ConsultationSlot {
     @Id
@@ -22,8 +24,6 @@ public class ConsultationSlot {
 
     private LocalDateTime endTime;
 
-    private int maxStudents;
-
     private String description;
 
     private boolean active = true;
@@ -35,12 +35,11 @@ public class ConsultationSlot {
     public ConsultationSlot() {
     }
 
-    public ConsultationSlot(Long id, User teacher, LocalDateTime startTime, LocalDateTime endTime, Integer maxStudents, String description, Boolean active) {
+    public ConsultationSlot(Long id, User teacher, LocalDateTime startTime, LocalDateTime endTime, String description, Boolean active) {
         this.id = id;
         this.teacher = teacher;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.maxStudents = maxStudents;
         this.description = description;
         this.active = active;
     }
@@ -79,14 +78,6 @@ public class ConsultationSlot {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
-    }
-
-    public Integer getMaxStudents() {
-        return maxStudents;
-    }
-
-    public void setMaxStudents(Integer maxStudents) {
-        this.maxStudents = maxStudents;
     }
 
     public String getDescription() {
