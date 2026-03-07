@@ -44,8 +44,13 @@ public class StudentController {
     }
 
     @PostMapping("/reserve")
-    public String reserve(@RequestParam Long slotId) {
-        User student = userRepository.findByUsername("student")
+    public String reserve(@RequestParam Long slotId, HttpSession session) {
+        User loggedUser = (User) session.getAttribute("user");
+        if (loggedUser == null || loggedUser.getRole() != Role.STUDENT) {
+            return "redirect:/login";
+        }
+
+        User student = userRepository.findById(loggedUser.getId())
                 .orElseThrow(() -> new RuntimeException("student nenajdeny"));
 
         try {

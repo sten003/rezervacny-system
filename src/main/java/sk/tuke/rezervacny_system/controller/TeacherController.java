@@ -47,10 +47,17 @@ public class TeacherController {
     public String createSlot(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
-            @RequestParam String description) {
+            @RequestParam String description,
+            HttpSession session) {
 
-        User teacher = userRepository.findByUsername("teacher")
-                .orElseThrow(() -> new RuntimeException("profil nenajdeny"));
+        User loggedUser = (User) session.getAttribute("user");
+        if (loggedUser == null || loggedUser.getRole() != Role.TEACHER) {
+            return "redirect:/login";
+        }
+
+        User teacher = userRepository.findById(loggedUser.getId())
+                .orElseThrow(() -> new RuntimeException("ucitel nenajdeny"));
+
         consultationService.createSlot(teacher, start, end, description);
 
         return "redirect:/teacher/overview";
