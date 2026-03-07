@@ -173,6 +173,11 @@
         document.getElementById('realStartInput').value = startDateTime;
         document.getElementById('realEndInput').value = endDateTime;
     }
+
+    //kvoli tomu aby sa koncovy cas nastavil automaticky o 30 neskor nie az ked uzivatel zmeni zaciatok
+    document.addEventListener('DOMContentLoaded', function() {
+        autoSetEndTime();
+    });
 </script>
 </body>
 </html>
