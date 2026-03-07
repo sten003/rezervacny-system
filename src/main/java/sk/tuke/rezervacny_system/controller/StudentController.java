@@ -3,10 +3,12 @@ package sk.tuke.rezervacny_system.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import sk.tuke.rezervacny_system.entity.Role;
 import sk.tuke.rezervacny_system.entity.User;
 import sk.tuke.rezervacny_system.repository.UserRepository;
 import sk.tuke.rezervacny_system.service.ConsultationService;
 import sk.tuke.rezervacny_system.service.ReservationService;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/student")
@@ -24,8 +26,14 @@ public class StudentController {
     }
 
     @GetMapping("/overview")
-    public String overview(Model model) {
-        User student = userRepository.findByUsername("student")
+    public String overview(HttpSession session, Model model) {
+        User loggedUser = (User) session.getAttribute("user");
+
+        if (loggedUser == null || loggedUser.getRole() != Role.STUDENT) {
+            return "redirect:/login";
+        }
+
+        User student = userRepository.findById(loggedUser.getId())
                 .orElseThrow(() -> new RuntimeException("student nenajdeny"));
 
         model.addAttribute("availableSlots", consultationService.getActiveFutureSlots());

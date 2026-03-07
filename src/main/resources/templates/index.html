@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Rezervačný systém</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .welcome-container {
+            text-align: center;
+            margin-top: 80px;
+        }
+        .welcome-container h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .welcome-container p {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .btn-secondary {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2ecc71;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn-secondary:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+<div class="container welcome-container">
+    <h1>Rezervačný systém konzultácií</h1>
+    <p>Vitajte! Prihláste sa, alebo sa zaregistrujte.</p>
+    <div class="btn-group">
+        <a th:href="@{/login}" class="btn">Prihlásenie</a>
+        <a th:href="@{/register}" class="btn btn-secondary">Registrácia</a>
+    </div>
+</div>
+</body>
+</html>

@@ -6,7 +6,10 @@
 </head>
 <body>
 <div class="container">
-    <h1>Vitajte, <span th:text="${teacherName}">Učiteľ</span></h1>
+    <div class="header-top">
+        <h1>Vitajte, <span th:text="${teacherName}">Učiteľ</span></h1>
+        <a th:href="@{/logout}" class="btn logout-btn">Odhlásiť sa</a>
+    </div>
 
     <h2>Vytvoriť nový termín</h2>
     <form action="/teacher/create" method="post" onsubmit="prepareDates()" class="create-slot-form">

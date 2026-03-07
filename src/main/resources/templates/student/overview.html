@@ -6,7 +6,10 @@
 </head>
 <body>
 <div class="container">
-    <h1>Vitajte, <span th:text="${studentName}">Študent</span></h1>
+    <div class="header-top">
+        <h1>Vitajte, <span th:text="${studentName}">Študent</span></h1>
+        <a th:href="@{/logout}" class="btn logout-btn">Odhlásiť sa</a>
+    </div>
 
     <h2>Dostupné termíny na konzultáciu</h2>
     <table>

@@ -4,10 +4,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import sk.tuke.rezervacny_system.entity.Role;
 import sk.tuke.rezervacny_system.entity.User;
 import sk.tuke.rezervacny_system.repository.UserRepository;
 import sk.tuke.rezervacny_system.service.ConsultationService;
-
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 
 @Controller
@@ -24,8 +25,15 @@ public class TeacherController {
 
     //zakladne ui
     @GetMapping("/overview")
-    public String overview(Model model) {
-        User teacher = userRepository.findByUsername("teacher")
+    public String overview(HttpSession session, Model model) {
+        User loggedUser = (User) session.getAttribute("user");
+
+        //kontrola ci je pouzivatel prihlaseny a ma spravnu rolu
+        if (loggedUser == null || loggedUser.getRole() != Role.TEACHER) {
+            return "redirect:/login";
+        }
+
+        User teacher = userRepository.findById(loggedUser.getId())
                 .orElseThrow(() -> new RuntimeException("ucitel nenajdeny"));
 
         model.addAttribute("slots", consultationService.getSlotsForTeacher(teacher));
