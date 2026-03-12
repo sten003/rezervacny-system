@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin - Pridať používateľa</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <div class="header-top">
+        <h1>Pridať používateľa</h1>
+        <a th:href="@{/admin/overview}" class="btn">Späť na prehľad</a>
+    </div>
+
+    <form th:action="@{/admin/create-user}" method="post" class="create-slot-form" style="max-width: 500px; margin: 0 auto;">
+
+        <div th:if="${param.error}" style="color: red; margin-bottom: 15px; text-align: center;">
+            Používateľ s týmto prihlasovacím menom už existuje.
+        </div>
+
+        <div class="form-group full-width">
+            <label>Prihlasovacie meno:</label>
+            <input type="text" name="username" required>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Celé meno:</label>
+            <input type="text" name="fullName" required>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Email:</label>
+            <input type="text" name="email" required>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Heslo:</label>
+            <input type="text" name="password" required>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Rola:</label>
+            <select name="role" required>
+                <option value="STUDENT">Študent</option>
+                <option value="TEACHER">Učiteľ</option>
+                <option value="ADMIN">Administrátor</option>
+            </select>
+        </div>
+
+        <div class="button-row">
+            <button type="submit" class="btn" style="width: 100%;">Vytvoriť používateľa</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

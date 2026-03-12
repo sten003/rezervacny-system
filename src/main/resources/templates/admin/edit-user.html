@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin - Úprava používateľa</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <div class="header-top">
+        <h1>Úprava používateľa</h1>
+        <a th:href="@{/admin/overview}" class="btn">Späť na prehľad</a>
+    </div>
+
+    <form th:action="@{/admin/update-user/{id}(id=${userToEdit.id})}" method="post" class="create-slot-form" style="max-width: 500px; margin: 0 auto;">
+
+        <div class="form-group full-width">
+            <label>Prihlasovacie meno:</label>
+            <input type="text" name="username" th:value="${userToEdit.username}" required>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Celé meno:</label>
+            <input type="text" name="fullName" th:value="${userToEdit.fullName}" required>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Email:</label>
+            <input type="text" name="email" th:value="${userToEdit.email}" required>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Nové heslo:</label>
+            <input type="text" name="password" th:value="${userToEdit.password}" required>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Rola:</label>
+            <select name="role" required th:disabled="${isSelf}">
+                <option value="STUDENT" th:selected="${userToEdit.role.name() == 'STUDENT'}">Študent</option>
+                <option value="TEACHER" th:selected="${userToEdit.role.name() == 'TEACHER'}">Učiteľ</option>
+                <option value="ADMIN" th:selected="${userToEdit.role.name() == 'ADMIN'}">Administrátor</option>
+            </select>
+            <!-- skryte pole na odoslanie roly ak chce zmenit seba -->
+            <input th:if="${isSelf}" type="hidden" name="role" value="ADMIN">
+            <small th:if="${isSelf}" style="color: gray;">Svoju vlastnú rolu nemôžete zmeniť.</small>
+        </div>
+
+        <div class="button-row">
+            <button type="submit" class="btn" style="width: 100%;">Uložiť zmeny</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>
