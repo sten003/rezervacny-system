@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reservations")
-@NamedQuery(name = "Reservation.findByStudent", query = "SELECT r FROM Reservation r WHERE r.student = :student")
+@NamedQuery(name = "Reservation.findByStudent", query = "SELECT r FROM Reservation r WHERE r.student = :student AND r.slot.startTime > :now ORDER BY r.slot.startTime ASC")
 @NamedQuery(name = "Reservation.findBySlot", query = "SELECT r FROM Reservation r WHERE r.slot = :slot AND r.active = true")
 @NamedQuery(name = "Reservation.countBySlot", query = "SELECT COUNT(r) FROM Reservation r WHERE r.slot = :slot AND r.active = true")
 @NamedQuery(name = "Reservation.findBySlotAndStudent", query = "SELECT r FROM Reservation r WHERE r.slot = :slot AND r.student = :student")

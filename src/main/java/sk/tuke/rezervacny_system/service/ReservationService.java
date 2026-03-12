@@ -33,7 +33,7 @@ public class ReservationService {
     }
 
     public List<Reservation> getReservationsForStudent(User student) {
-        return reservationRepository.findByStudent(student);
+        return reservationRepository.findByStudent(student, LocalDateTime.now());
     }
 
     public void approveReservation(Long reservationId, User teacher) {
@@ -61,5 +61,9 @@ public class ReservationService {
         reservation.setStatus("REJECTED");
         reservation.setActive(false);
         reservationRepository.save(reservation);
+
+        ConsultationSlot slot = reservation.getSlot();
+        slot.setActive(false);
+        slotRepository.save(slot);
     }
 }

@@ -29,7 +29,7 @@ public class ConsultationService {
 
     //necitanie slotov podla ucitela
     public List<ConsultationSlot> getSlotsForTeacher(User teacher) {
-        return slotRepository.findByTeacherAndActiveTrue(teacher);
+        return slotRepository.findByTeacher(teacher, LocalDateTime.now());
     }
 
     //nova metoda kvôli nezobrazovaniuu obsadenych slotov

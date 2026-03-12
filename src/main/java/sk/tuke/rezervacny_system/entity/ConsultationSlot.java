@@ -6,7 +6,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "consultation_slots")
-@NamedQuery(name = "ConsultationSlot.findByTeacher", query = "SELECT s FROM ConsultationSlot s WHERE s.teacher = :teacher")
+@NamedQuery(name = "ConsultationSlot.findByTeacher", query = "SELECT s FROM ConsultationSlot s WHERE s.teacher = :teacher AND s.active = true AND s.startTime > :now ORDER BY s.startTime ASC")
 @NamedQuery(name = "ConsultationSlot.findAllActive", query = "SELECT s FROM ConsultationSlot s WHERE s.active = true ORDER BY s.startTime")
 //@NamedQuery(name = "ConsultationSlot.findFuture", query = "SELECT s FROM ConsultationSlot s WHERE s.active = true AND s.startTime > :now ORDER BY s.startTime")
 @NamedQuery(name = "ConsultationSlot.findAvailableFuture", query = "SELECT s FROM ConsultationSlot s WHERE s.active = true AND s.startTime > :now " +
