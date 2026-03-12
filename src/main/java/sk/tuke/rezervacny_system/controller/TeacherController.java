@@ -6,8 +6,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import sk.tuke.rezervacny_system.entity.Role;
 import sk.tuke.rezervacny_system.entity.User;
+import sk.tuke.rezervacny_system.repository.ReservationRepository;
 import sk.tuke.rezervacny_system.repository.UserRepository;
 import sk.tuke.rezervacny_system.service.ConsultationService;
+import sk.tuke.rezervacny_system.service.ReservationService;
+
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 
@@ -17,10 +20,14 @@ public class TeacherController {
 
     private final ConsultationService consultationService;
     private final UserRepository userRepository;
+    private final ReservationService reservationService;
+    private final ReservationRepository reservationRepository;
 
-    public TeacherController(ConsultationService consultationService, UserRepository userRepository) {
+    public TeacherController(ConsultationService consultationService, UserRepository userRepository, ReservationService reservationService, ReservationRepository reservationRepository) {
         this.consultationService = consultationService;
         this.userRepository = userRepository;
+        this.reservationService = reservationService;
+        this.reservationRepository = reservationRepository;
     }
 
     //zakladne ui
@@ -38,6 +45,7 @@ public class TeacherController {
 
         model.addAttribute("slots", consultationService.getSlotsForTeacher(teacher));
         model.addAttribute("teacherName", teacher.getFullName());
+        model.addAttribute("pendingReservations", reservationRepository.findBySlotTeacherAndStatus(teacher, "PENDING"));
 
         return "teacher/overview";
     }
@@ -60,6 +68,28 @@ public class TeacherController {
 
         consultationService.createSlot(teacher, start, end, description);
 
+        return "redirect:/teacher/overview";
+    }
+
+    @PostMapping("/approve-reservation/{id}")
+    public String approveReservation(@PathVariable Long id, HttpSession session) {
+        User loggedUser = (User) session.getAttribute("user");
+        if (loggedUser == null || loggedUser.getRole() != Role.TEACHER) {
+            return "redirect:/login";
+        }
+
+        reservationService.approveReservation(id, loggedUser);
+        return "redirect:/teacher/overview";
+    }
+
+    @PostMapping("/reject-reservation/{id}")
+    public String rejectReservation(@PathVariable Long id, HttpSession session) {
+        User loggedUser = (User) session.getAttribute("user");
+        if (loggedUser == null || loggedUser.getRole() != Role.TEACHER) {
+            return "redirect:/login";
+        }
+
+        reservationService.rejectReservation(id, loggedUser);
         return "redirect:/teacher/overview";
     }
 }

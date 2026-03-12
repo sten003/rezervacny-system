@@ -27,6 +27,8 @@ public class Reservation {
 
     private boolean active = true;
 
+    private String status = "PENDING";
+
 
 
     //k
@@ -76,11 +78,19 @@ public class Reservation {
         this.createdAt = createdAt;
     }
 
-    public Boolean getActive() {
+    public boolean isActive() {
         return active;
     }
 
-    public void setActive(Boolean active) {
+    public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

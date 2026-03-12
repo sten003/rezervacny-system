@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     List<Reservation> findByStudent(User student);
-    boolean existsBySlotAndStudentAndActiveTrue(ConsultationSlot slot, User student); //existuje uz rezervacia??
+    List<Reservation> findBySlotTeacherAndStatus(User teacher, String status);
 }

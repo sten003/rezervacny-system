@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ConsultationSlotRepository extends JpaRepository<ConsultationSlot, Long> {
-    List<ConsultationSlot> findByTeacher(User teacher); //sloty podla ucitela
-    //List<ConsultationSlot> findByActiveTrueAndStartTimeAfter(LocalDateTime dateTime); //aktivne sloty po aktualnom case - kvoli nezobrazovaniu starych terminov
     List<ConsultationSlot> findAvailableFuture(@Param("now") LocalDateTime now); //zobrazovanie neobsadenych terminov
+    List<ConsultationSlot> findByTeacherAndActiveTrue(User teacher); //zobrazenie iba jeho aktivnych slotov pre ucitela - kvoli tomu ze ak nejaky zamietne a zmeni sa na false aby ho nezobrazovalo
 }

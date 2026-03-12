@@ -35,4 +35,31 @@ public class ReservationService {
     public List<Reservation> getReservationsForStudent(User student) {
         return reservationRepository.findByStudent(student);
     }
+
+    public void approveReservation(Long reservationId, User teacher) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Chyba"));
+
+        //overenie ci rezervacia patri ucitelovi
+        if (!reservation.getSlot().getTeacher().getId().equals(teacher.getId())) {
+            throw new RuntimeException("Nemáte oprávnenie na schválenie tejto rezervácie!");
+        }
+
+        reservation.setStatus("APPROVED");
+        reservationRepository.save(reservation);
+    }
+
+    public void rejectReservation(Long reservationId, User teacher) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Chyba"));
+
+        if (!reservation.getSlot().getTeacher().getId().equals(teacher.getId())) {
+            throw new RuntimeException("Nemáte oprávnenie na zamietnutie tejto rezervácie!");
+        }
+
+        //neodstranime ju z databazy aby student videl ze je zamitnuta
+        reservation.setStatus("REJECTED");
+        reservation.setActive(false);
+        reservationRepository.save(reservation);
+    }
 }

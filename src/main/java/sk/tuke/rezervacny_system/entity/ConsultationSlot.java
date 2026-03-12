@@ -2,6 +2,7 @@ package sk.tuke.rezervacny_system.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "consultation_slots")
@@ -19,6 +20,11 @@ public class ConsultationSlot {
     @ManyToOne
     @JoinColumn(name = "teacher_id", nullable = false)
     private User teacher;
+
+    //kvoli ucitelskemu rozhraniu
+    //prepojenie aby sme sa dalo vypisat ze rezervacia je potvrdena pri konkretnom rezervacnom slote
+    @OneToMany(mappedBy = "slot", fetch = FetchType.EAGER)
+    private List<Reservation> reservations;
 
     private LocalDateTime startTime;
 
@@ -94,5 +100,13 @@ public class ConsultationSlot {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
 }

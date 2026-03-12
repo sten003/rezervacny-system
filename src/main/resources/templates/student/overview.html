@@ -39,23 +39,24 @@
         </tbody>
     </table>
 
-    <h2 style="margin-top: 40px;">Moje rezervácie</h2>
+    <h2>Moje rezervácie</h2>
     <table>
         <thead>
         <tr>
-            <th>Učiteľ</th>
+            <th>Pedagóg</th>
             <th>Termín</th>
-            <th>Vytvorené</th>
+            <th>Stav</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="res : ${myReservations}">
-            <td th:text="${res.slot.teacher.fullName}"></td>
-            <td th:text="${#temporals.format(res.slot.startTime, 'dd.MM.yyyy HH:mm')}"></td>
-            <td th:text="${#temporals.format(res.createdAt, 'dd.MM.yyyy HH:mm')}"></td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(myReservations)}">
-            <td colspan="3" style="text-align: center;">Nemáte žiadne rezervácie.</td>
+        <tr th:each="reservation : ${myReservations}">
+            <td th:text="${reservation.slot.teacher.fullName}">Meno pedagóga</td>
+            <td th:text="${reservation.slot.startTime + ' - ' + reservation.slot.endTime}">Čas</td>
+            <td>
+                <span th:if="${reservation.status == 'PENDING'}" style="color: orange; font-weight: bold;">Čaká na schválenie</span>
+                <span th:if="${reservation.status == 'APPROVED'}" style="color: green; font-weight: bold;">Schválené</span>
+                <span th:if="${reservation.status == 'REJECTED'}" style="color: red; font-weight: bold;">Zamietnuté</span>
+            </td>
         </tr>
         </tbody>
     </table>

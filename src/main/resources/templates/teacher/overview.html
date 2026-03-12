@@ -95,6 +95,31 @@
         </div>
     </form>
 
+    <h2>Konzultácie čakajúce na schválenie</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Študent</th>
+            <th>Termín</th>
+            <th>Akcia</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="reservation : ${pendingReservations}">
+            <td th:text="${reservation.student.fullName}">Meno študenta</td>
+            <td th:text="${reservation.slot.startTime + ' - ' + reservation.slot.endTime}">Čas</td>
+            <td>
+                <form th:action="@{/teacher/approve-reservation/{id}(id=${reservation.id})}" method="post" style="display:inline;">
+                    <button type="submit">Schváliť</button>
+                </form>
+                <form th:action="@{/teacher/reject-reservation/{id}(id=${reservation.id})}" method="post" style="display:inline;">
+                    <button type="submit">Zamietnuť</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
     <h2>Moje vypísané termíny</h2>
     <table>
         <thead>
@@ -109,8 +134,20 @@
             <td th:text="${#temporals.format(slot.startTime, 'dd.MM.yyyy HH:mm')} + ' - ' + ${#temporals.format(slot.endTime, 'HH:mm')}"></td>
             <td th:text="${slot.description}"></td>
             <td>
-                <span th:if="${slot.active}" style="color: green; font-weight: bold;">Aktívny</span>
-                <span th:unless="${slot.active}" style="color: red;">Zrušený</span>
+                <!-- zistit ci ma slot nejaku rezervaciu nastavenu na approved -->
+                <th:block th:with="approvedList=${slot.reservations.?[status == 'APPROVED']}">
+
+                    <!-- ak nie je prazdny list tak vypiseme -->
+                    <span th:if="${not #lists.isEmpty(approvedList)}" style="color: blue; font-weight: bold;">
+                            Schválené (<span th:text="${approvedList[0].student.fullName}">Meno</span>)
+                        </span>
+
+                    <!-- prazdny list approved a aktivne sloty -->
+                    <span th:if="${#lists.isEmpty(approvedList) and slot.active}" style="color: green; font-weight: bold;">
+                            Aktívny
+                        </span>
+
+                </th:block>
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(slots)}">

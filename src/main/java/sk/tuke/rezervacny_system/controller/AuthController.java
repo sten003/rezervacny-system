@@ -97,9 +97,14 @@ public class AuthController {
         if (user.getRole() == Role.TEACHER) {
             return "redirect:/teacher/overview";
         }
-        else {
+        else if (user.getRole() == Role.STUDENT) {
             return "redirect:/student/overview";
         }
+        else if (user.getRole() == Role.ADMIN) {
+            return "redirect:/admin/overview";
+        }
+
+        return "redirect:/login";
     }
 
     //--------------------------------logout--------------------------------
