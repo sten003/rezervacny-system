@@ -12,7 +12,9 @@ import sk.tuke.rezervacny_system.service.ConsultationService;
 import sk.tuke.rezervacny_system.service.ReservationService;
 
 import javax.servlet.http.HttpSession;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Controller
 @RequestMapping("/teacher")
@@ -69,6 +71,30 @@ public class TeacherController {
         consultationService.createSlot(teacher, start, end, description);
 
         return "redirect:/teacher/overview";
+    }
+
+    @PostMapping("/create-repeating-slots")
+    public String createRecurringSlots(
+            @RequestParam("dayOfWeek") String dayOfWeekStr,
+            @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+            @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime,
+            @RequestParam String description,
+            @RequestParam("weeks") int weeks,
+            HttpSession session) {
+
+        User loggedUser = (User) session.getAttribute("user");
+        if (loggedUser == null || loggedUser.getRole() != Role.TEACHER) {
+            return "redirect:/login";
+        }
+
+        User teacher = userRepository.findById(loggedUser.getId())
+                .orElseThrow(() -> new RuntimeException("ucitel nenajdeny"));
+
+        DayOfWeek dayOfWeek = DayOfWeek.valueOf(dayOfWeekStr.toUpperCase());
+
+        consultationService.createRepeatingSlots(teacher, dayOfWeek, startTime, endTime, description, weeks);
+
+        return "redirect:/teacher/overview?success=repeating";
     }
 
     @PostMapping("/approve-reservation/{id}")
