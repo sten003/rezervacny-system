@@ -113,14 +113,8 @@
 
                 <div class="datetime-row">
                     <div class="form-group inline-group">
-                        <label for="dayOfWeek">Deň v týždni:</label>
-                        <select name="dayOfWeek" id="dayOfWeek" required>
-                            <option value="MONDAY">Pondelok</option>
-                            <option value="TUESDAY">Utorok</option>
-                            <option value="WEDNESDAY">Streda</option>
-                            <option value="THURSDAY">Štvrtok</option>
-                            <option value="FRIDAY">Piatok</option>
-                        </select>
+                        <label>Dátum:</label>
+                        <input type="date" id="repeatingDateInput" required>
                     </div>
 
                     <div class="form-group inline-group">
@@ -184,6 +178,7 @@
                     </div>
                 </div>
 
+                <input type="hidden" name="startDate" id="realRepeatingStartDate">
                 <input type="hidden" name="startTime" id="realRepeatingStartTime">
                 <input type="hidden" name="endTime" id="realRepeatingEndTime">
 
@@ -279,11 +274,13 @@
     }
 
     function prepareRepeatingTimes() {
+        var dateVal = document.getElementById("repeatingDateInput").value;
         var sHour = document.getElementById("repeatingStartHour").value;
         var sMin = document.getElementById("repeatingStartMinute").value;
         var eHour = document.getElementById("repeatingEndHour").value;
         var eMin = document.getElementById("repeatingEndMinute").value;
 
+        document.getElementById("realRepeatingStartDate").value = dateVal;
         document.getElementById("realRepeatingStartTime").value = sHour + ":" + sMin;
         document.getElementById("realRepeatingEndTime").value = eHour + ":" + eMin;
     }

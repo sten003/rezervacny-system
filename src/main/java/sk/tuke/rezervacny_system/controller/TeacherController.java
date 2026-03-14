@@ -11,7 +11,7 @@ import sk.tuke.rezervacny_system.repository.UserRepository;
 import sk.tuke.rezervacny_system.service.ConsultationService;
 import sk.tuke.rezervacny_system.service.ReservationService;
 import javax.servlet.http.HttpSession;
-import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -72,6 +72,29 @@ public class TeacherController {
         return "redirect:/teacher/create-page?success=single";
     }
 
+    //vytvorenie opakovanych terminov
+    @PostMapping("/create-repeating-slots")
+    public String createRecurringSlots(
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime start,
+            @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime end,
+            @RequestParam String description,
+            @RequestParam("weeks") int weeks,
+            HttpSession session) {
+
+        User loggedUser = (User) session.getAttribute("user");
+        if (loggedUser == null || loggedUser.getRole() != Role.TEACHER) {
+            return "redirect:/login";
+        }
+
+        User teacher = userRepository.findById(loggedUser.getId())
+                .orElseThrow(() -> new RuntimeException("ucitel nenajdeny"));
+
+        consultationService.createRepeatingSlots(teacher, startDate, start, end, description, weeks);
+
+        return "redirect:/teacher/create-page?success=repeating";
+    }
+
     //stranka na vytvaranie terminov
     @GetMapping("/create-page")
     public String createPage(HttpSession session, Model model) {
@@ -107,31 +130,6 @@ public class TeacherController {
         model.addAttribute("pendingReservations", reservationRepository.findBySlotTeacherAndStatus(teacher, "PENDING"));
 
         return "teacher/approvals";
-    }
-
-    //vytvorenie opakovanych terminov
-    @PostMapping("/create-repeating-slots")
-    public String createRepeatingSlots(
-            @RequestParam("dayOfWeek") String dayOfWeekStr,
-            @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-            @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime,
-            @RequestParam String description,
-            @RequestParam("weeks") int weeks,
-            HttpSession session) {
-
-        User loggedUser = (User) session.getAttribute("user");
-        if (loggedUser == null || loggedUser.getRole() != Role.TEACHER) {
-            return "redirect:/login";
-        }
-
-        User teacher = userRepository.findById(loggedUser.getId())
-                .orElseThrow(() -> new RuntimeException("ucitel nenajdeny"));
-
-        DayOfWeek dayOfWeek = DayOfWeek.valueOf(dayOfWeekStr.toUpperCase());
-
-        consultationService.createRepeatingSlots(teacher, dayOfWeek, startTime, endTime, description, weeks);
-
-        return "redirect:/teacher/create-page?success=repeating";
     }
 
     @PostMapping("/approve-reservation/{id}")

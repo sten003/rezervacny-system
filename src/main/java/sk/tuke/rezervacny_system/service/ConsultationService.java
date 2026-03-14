@@ -32,12 +32,13 @@ public class ConsultationService {
     }
 
     public void createRepeatingSlots(User teacher,
-                                     DayOfWeek dayOfWeek,
+                                     LocalDate startDate,
                                      LocalTime startTime,
                                      LocalTime endTime,
                                      String description,
                                      int repeat) {
-        LocalDate nextDate = LocalDate.now().with(TemporalAdjusters.nextOrSame(dayOfWeek));
+
+        LocalDate nextDate = startDate;
 
         for (int i = 0; i < repeat; i++) {
             LocalDateTime slotStartTime = LocalDateTime.of(nextDate, startTime);
