@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import sk.tuke.rezervacny_system.entity.Role;
 import sk.tuke.rezervacny_system.entity.User;
 import sk.tuke.rezervacny_system.repository.UserRepository;
-
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
 

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Schvaľovanie termínov</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <div class="header-top">
+        <h1>Vitajte, <span th:text="${teacherName}">Učiteľ</span></h1>
+        <a th:href="@{/logout}" class="btn logout-btn">Odhlásiť sa</a>
+    </div>
+
+    <div class="button-row" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+        <a th:href="@{/teacher/overview}" class="btn">Prehľad termínov</a>
+        <a th:href="@{/teacher/create-page}" class="btn">Vytvorenie termínov</a>
+        <a th:href="@{/teacher/approvals}" class="btn">Schvaľovanie termínov</a>
+    </div>
+
+    <h2>Konzultácie čakajúce na schválenie</h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Študent</th>
+            <th>Termín</th>
+            <th>Akcia</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="reservation : ${pendingReservations}">
+            <td th:text="${reservation.student.fullName}">Meno študenta</td>
+            <td th:text="${reservation.slot.startTime + ' - ' + reservation.slot.endTime}">Čas</td>
+            <td>
+                <form th:action="@{/teacher/approve-reservation/{id}(id=${reservation.id})}" method="post" style="display:inline;">
+                    <input type="hidden"
+                           th:if="${_csrf != null}"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}" />
+                    <button type="submit" class="btn">Schváliť</button>
+                </form>
+
+                <form th:action="@{/teacher/reject-reservation/{id}(id=${reservation.id})}" method="post" style="display:inline;">
+                    <input type="hidden"
+                           th:if="${_csrf != null}"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}" />
+                    <button type="submit" class="btn logout-btn">Zamietnuť</button>
+                </form>
+            </td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(pendingReservations)}">
+            <td colspan="3" style="text-align: center;">Žiadne termíny nečakajú na schválenie.</td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

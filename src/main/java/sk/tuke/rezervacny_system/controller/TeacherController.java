@@ -10,7 +10,6 @@ import sk.tuke.rezervacny_system.repository.ReservationRepository;
 import sk.tuke.rezervacny_system.repository.UserRepository;
 import sk.tuke.rezervacny_system.service.ConsultationService;
 import sk.tuke.rezervacny_system.service.ReservationService;
-
 import javax.servlet.http.HttpSession;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -47,7 +46,7 @@ public class TeacherController {
 
         model.addAttribute("slots", consultationService.getSlotsForTeacher(teacher));
         model.addAttribute("teacherName", teacher.getFullName());
-        model.addAttribute("pendingReservations", reservationRepository.findBySlotTeacherAndStatus(teacher, "PENDING"));
+        //model.addAttribute("pendingReservations", reservationRepository.findBySlotTeacherAndStatus(teacher, "PENDING"));
 
         return "teacher/overview";
     }
@@ -70,11 +69,49 @@ public class TeacherController {
 
         consultationService.createSlot(teacher, start, end, description);
 
-        return "redirect:/teacher/overview";
+        return "redirect:/teacher/create-page?success=single";
     }
 
+    //stranka na vytvaranie terminov
+    @GetMapping("/create-page")
+    public String createPage(HttpSession session, Model model) {
+        User loggedUser = (User) session.getAttribute("user");
+
+        //kontrola ci je pouzivatel prihlaseny a ma spravnu rolu
+        if (loggedUser == null || loggedUser.getRole() != Role.TEACHER) {
+            return "redirect:/login";
+        }
+
+        User teacher = userRepository.findById(loggedUser.getId())
+                .orElseThrow(() -> new RuntimeException("ucitel nenajdeny"));
+
+        model.addAttribute("teacherName", teacher.getFullName());
+
+        return "teacher/create-page";
+    }
+
+    //stranka na schvalovanie terminov
+    @GetMapping("/approvals")
+    public String approvals(HttpSession session, Model model) {
+        User loggedUser = (User) session.getAttribute("user");
+
+        //kontrola ci je pouzivatel prihlaseny a ma spravnu rolu
+        if (loggedUser == null || loggedUser.getRole() != Role.TEACHER) {
+            return "redirect:/login";
+        }
+
+        User teacher = userRepository.findById(loggedUser.getId())
+                .orElseThrow(() -> new RuntimeException("ucitel nenajdeny"));
+
+        model.addAttribute("teacherName", teacher.getFullName());
+        model.addAttribute("pendingReservations", reservationRepository.findBySlotTeacherAndStatus(teacher, "PENDING"));
+
+        return "teacher/approvals";
+    }
+
+    //vytvorenie opakovanych terminov
     @PostMapping("/create-repeating-slots")
-    public String createRecurringSlots(
+    public String createRepeatingSlots(
             @RequestParam("dayOfWeek") String dayOfWeekStr,
             @RequestParam("startTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
             @RequestParam("endTime") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime,
@@ -94,7 +131,7 @@ public class TeacherController {
 
         consultationService.createRepeatingSlots(teacher, dayOfWeek, startTime, endTime, description, weeks);
 
-        return "redirect:/teacher/overview?success=repeating";
+        return "redirect:/teacher/create-page?success=repeating";
     }
 
     @PostMapping("/approve-reservation/{id}")
@@ -105,7 +142,7 @@ public class TeacherController {
         }
 
         reservationService.approveReservation(id, loggedUser);
-        return "redirect:/teacher/overview";
+        return "redirect:/teacher/approvals?success=approved";
     }
 
     @PostMapping("/reject-reservation/{id}")
@@ -116,6 +153,6 @@ public class TeacherController {
         }
 
         reservationService.rejectReservation(id, loggedUser);
-        return "redirect:/teacher/overview";
+        return "redirect:/teacher/approvals?success=rejected";
     }
 }
